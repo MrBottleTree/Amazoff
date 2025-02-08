@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Amazoff</title>
+
+  <!-- Link to External CSS -->
+  <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
+
+  <!-- FontAwesome for Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <style>
+    /* White background for standalone login page */
+    body {
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Large Login Message (Now Outside the Box) -->
+<h2 class="login-heading">{{message}}</h2>
+
+<div class="login-container">
+  <h2>Login to Your Account</h2>
+
+  <!-- Login Form -->
+  <form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="input-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required>
+    </div>
+
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required>
+    </div>
+
+    <button type="submit" class="login-btn">Login</button>
+  </form>
+
+  <!-- Registration Link -->
+  <p class="register-link">
+    New here? <a href="{% url 'register' %}">Register now</a>
+  </p>
+</div>
+
+</body>
+</html>
