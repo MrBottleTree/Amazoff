@@ -1,0 +1,22 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}
+    Welcome to Amazoff
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <h1>Hello, {{ name }}!</h1>
+  <small>Welcome to Amazoff</small>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <input type="text" placeholder="Search for products...">
+  </div>
+
+  <!-- Login/Register Links -->
+  <div class="auth-links">
+    <a href="#">🔑 Login</a> | <a href="#">📝 Register</a>
+  </div>
+</div>
+{% endblock %}

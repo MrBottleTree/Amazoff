@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Amazoff{% endblock %}</title>
+
+  <!-- Link to External CSS -->
+  <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
+
+  <!-- FontAwesome for Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Hamburger Menu (☰) -->
+  <span class="menu-icon" onclick="openSidebar()">☰</span>
+
+  <!-- Main Content Area -->
+  {% block content %}
+  {% endblock %}
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <span class="close-btn" onclick="closeSidebar()">✖</span>
+    <h2>Menu</h2>
+    <a href="#">🛍️ View All Products</a>
+    <a href="#">🛒 View Cart</a>
+    <a href="#">⚙️ Account Dashboard</a>
+    <a href="#">📜 Order History</a>
+  </div>
+
+  <!-- JavaScript for Sidebar -->
+  <script>
+    function openSidebar() {
+      document.getElementById("sidebar").style.left = "0";
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebar").style.left = "-250px";
+    }
+  </script>
+
+</body>
+</html>
