@@ -2,45 +2,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Amazoff{% endblock %}</title>
-
-  <!-- Link to External CSS -->
-  <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
-
-  <!-- FontAwesome for Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazoff - {% block title %}{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-  <!-- Hamburger Menu (☰) -->
-  <span class="menu-icon" onclick="openSidebar()">☰</span>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            
+            <!-- Left Section: Logo & Location -->
+            <div class="nav-left">
+                <a href="{% url 'home' %}" class="logo">Amazoff</a>
+                <a href="#" class="location-btn">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Deliver to {{ city }}</span>
+                </a>
+            </div>
 
-  <!-- Main Content Area -->
-  {% block content %}
-  {% endblock %}
+            <!-- Center Section: Search Bar -->
+            <div class="search-container">
+                <div class="category-dropdown">
+                    <select>
+                        <option>All Categories</option>
+                        <option>Electronics</option>
+                        <option>Fashion</option>
+                        <option>Home & Kitchen</option>
+                    </select>
+                </div>
+                <input type="text" placeholder="Search products..." class="search-input">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <span class="close-btn" onclick="closeSidebar()">✖</span>
-    <h2>Menu</h2>
-    <a href="#">🛍️ View All Products</a>
-    <a href="#">🛒 View Cart</a>
-    <a href="#">⚙️ Account Dashboard</a>
-    <a href="#">📜 Order History</a>
-  </div>
+            <!-- Right Section: Wallet, User & Cart -->
+            <div class="nav-right">
+                
+                <!-- Wallet Button -->
+                <a href="{%url 'addmoney' 1000%}" class="wallet-btn">
+                    <i class="fas fa-wallet"></i>
+                    <span>₹{{ balance }}</span>
+                </a>
 
-  <!-- JavaScript for Sidebar -->
-  <script>
-    function openSidebar() {
-      document.getElementById("sidebar").style.left = "0";
-    }
+                <!-- User Dropdown -->
+                <div class="user-dropdown">
+                    <a href="{% url 'dashboard' %}" class="username">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ name }}</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'dashboard' %}"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#"><i class="fas fa-box-open"></i> Orders</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
 
-    function closeSidebar() {
-      document.getElementById("sidebar").style.left = "-250px";
-    }
-  </script>
+                <!-- Cart Icon (Updated) -->
+                <a href="#" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i> <!-- Updated icon -->
+                    <span class="cart-count">{{items_in_cart}}</span>
+                </a>
 
+            </div> <!-- End of nav-right -->
+        </div> <!-- End of nav-container -->
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        <!-- Page content goes here -->
+        {% endblock %}
+    </main>
+
+    {% block extra_js %}{% endblock %}
+    
 </body>
 </html>

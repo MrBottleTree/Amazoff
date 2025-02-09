@@ -1,87 +1,69 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Amazoff</title>
-
-  <!-- Link to External CSS -->
-  <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
-
-  <!-- FontAwesome for Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-  <style>
-    /* White background for standalone register page */
-    body {
-      background-color: #ffffff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-  </style>
-
-  <script>
-    function validatePasswords() {
-      var password1 = document.getElementById("password1").value;
-      var password2 = document.getElementById("password2").value;
-      var errorMsg = document.getElementById("password-error");
-
-      if (password1 !== password2) {
-        errorMsg.textContent = "Passwords do not match!";
-        return false; // Prevent form submission
-      } else {
-        errorMsg.textContent = ""; // Clear error if passwords match
-        return true; // Allow form submission
-      }
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazoff - Register</title>
+    
+    <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            {% if messages %}
+                <div class="message-container">
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% elif message.tags == 'info' %}alert-info{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
-<!-- Large Register Message (Now Outside the Box) -->
-<h2 class="login-heading">{{ message }}</h2>
+            <h2 class="auth-title">Create an Account</h2>
+            
+            <form method="POST" class="auth-form" action="{% url 'register' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
 
-<div class="login-container">
-  <h2>Register</h2>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
 
-  <!-- Registration Form -->
-  <form method="POST" action="{% url 'register' %}" onsubmit="return validatePasswords()">
-    {% csrf_token %}
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" name="password1" required>
+                </div>
 
-    <div class="input-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" name="password2" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="user_type">I am a:</label>
+                    <select id="user_type" name="user_type" required>
+                        <option value="buyer">Buyer</option>
+                        <option value="seller">Seller</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-action">Register</button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="{% url 'login' %}" class="auth-link">Login here</a>
+            </p>
+        </div>
     </div>
-
-    <div class="input-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email" required>
-    </div>
-
-    <div class="input-group">
-      <label for="password1">Password</label>
-      <input type="password" id="password1" name="password1" placeholder="Create a password" required>
-    </div>
-
-    <div class="input-group">
-      <label for="password2">Confirm Password</label>
-      <input type="password" id="password2" name="password2" placeholder="Confirm your password" required>
-      <p id="password-error" style="color: red; font-size: 14px;"></p>
-    </div>
-
-    <button type="submit" class="login-btn">Register</button>
-  </form>
-
-  <!-- Login Link -->
-  <p class="register-link">
-    Already have an account? <a href="{% url 'login' %}">Login here</a>
-  </p>
-</div>
 
 </body>
 </html>

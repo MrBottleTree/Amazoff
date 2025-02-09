@@ -11,11 +11,6 @@ class Status(models.TextChoices):
     ACCEPTED = 'accepted', 'Accepted'
     REJECTED = 'rejected', 'Rejected'
 
-class AddressType(models.TextChoices):
-    BUYER = 'buyer', 'Buyer'
-    SELLER = 'seller', 'Seller'
-    OTHER = 'other', 'Other'
-
 class people(models.Model):
     user_id = models.AutoField(primary_key=True)
     user_name = models.CharField(max_length=50, unique=True, null=False)
@@ -27,13 +22,14 @@ class people(models.Model):
         return f"{self.user_type} {self.user_name}"
     
 class address(models.Model):
+    associated_with = models.ForeignKey(people, on_delete=models.CASCADE, related_name="addresses")
     address_id = models.AutoField(primary_key=True)
     street = models.CharField(max_length=50, null=False)
     city = models.CharField(max_length=50, null=False)
     state = models.CharField(max_length=50, null=False)
     zip_code = models.CharField(max_length=10, null=False)
     country = models.CharField(max_length=50, null=False)
-    address_type = models.CharField(max_length=6, choices=AddressType.choices, default=AddressType.OTHER)
+    address_type = models.CharField(max_length=6, choices=UserType.choices, default=UserType.BUYER)
 
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.zip_code}, {self.country}"
@@ -60,10 +56,12 @@ class company(models.Model):
         return f"{self.name}"
 
 class product(models.Model):
+    seller = models.ForeignKey(people, on_delete=models.CASCADE, related_name="products_sold")
     product_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, null=False)
-    description = models.CharField(max_length=1000, null=False)
+    description = models.CharField(max_length=10000, null=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
+    image = models.ImageField(upload_to='product_images/', null=True)
     company = models.ForeignKey(company, on_delete=models.CASCADE, related_name="products")
 
     def __str__(self):
@@ -104,8 +102,6 @@ class orderdetails(models.Model):
 class cart(models.Model):
     buyer = models.ForeignKey(people, on_delete=models.CASCADE, related_name="cart")
     created_date = models.DateTimeField(auto_now_add=True)
-    isgift = models.BooleanField(null=False)
-    isselected = models.BooleanField(null=True)
 
     def __str__(self):
         return f"{self.buyer}'s cart created on {self.created_date}"
@@ -114,6 +110,8 @@ class cartitems(models.Model):
     cart = models.ForeignKey(cart, on_delete=models.CASCADE, related_name="cart_items")
     product = models.ForeignKey(product, on_delete=models.CASCADE, related_name="cart_items")
     quantity = models.IntegerField(null=False)
+    isgift = models.BooleanField(default=False)
+    isselected = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.product} x {self.quantity}"

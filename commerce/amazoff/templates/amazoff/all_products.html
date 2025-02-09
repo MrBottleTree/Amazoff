@@ -1,0 +1,28 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}All Products{% endblock %}
+
+{% block content %}
+    <div class="all-products-container">
+        <h2 class="page-title">Browse All Inventories</h2>
+
+        <div class="inventory-grid">
+            {% for inv in all_inventories %}
+                <a href="#" class="inventory-item">  <!-- Make the whole box a link -->
+                    <div class="inventory-img">
+                        <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
+                    </div>
+                    <div class="inventory-details">
+                        <h4>{{ inv.product.title }}</h4>
+                        <p><strong>Price:</strong> ₹{{ inv.product.price }}</p>
+                        <p><strong>Quantity Available:</strong> {{ inv.quantity }}</p>
+                        <p><strong>Seller:</strong> {{ inv.associated_with.user_name }}</p>
+                        <p><strong>Location:</strong> {{ inv.address.city }}, {{ inv.address.state }}</p>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="empty-text">No products available at the moment.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

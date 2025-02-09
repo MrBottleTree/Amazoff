@@ -1,0 +1,51 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <h2 class="profile-title">My Profile</h2>
+        
+        <div class="profile-info">
+            <p><strong>User ID:</strong> {{ user_id }}</p>
+            <p><strong>Name:</strong> {{ name }}</p>
+            <p><strong>Email:</strong> {{ email }}</p>
+            <p><strong>Amazoff Balance:</strong> ₹{{ balance }}</p>
+            <p><strong>User Type:</strong> {{ user_type }}</p>
+        </div>
+
+        <h3 class="section-title">Addresses</h3>
+        <ul class="address-list">
+            {% for addr in user_addresses %}
+                <li class="address-item">
+                    {{addr}}
+                </li>
+            {% empty %}
+                <p class="empty-text">No addresses found.</p>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'addaddress' %}" class="btn-add">Add New Address</a>
+
+        {% if user_type == 'Seller' %}
+            <h3 class="section-title">My Inventory</h3>
+            <div class="inventory-container">
+                {% for inv in user_inventory %}
+                    <a href="#" class="inventory-item">  <!-- Wrapped in a link -->
+                        <div class="inventory-img">
+                            <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
+                        </div>
+                        <div class="inventory-details">
+                            <h4>{{ inv.product.title }}</h4>
+                            <p><strong>Price:</strong> ₹{{ inv.product.price }}</p>
+                            <p><strong>Quantity:</strong> {{ inv.quantity }}</p>
+                        </div>
+                    </a>
+                {% empty %}
+                    <p class="empty-text">No inventory items found.</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'addinventory' %}" class="btn-add">Add New Inventory</a>
+        {% endif %}
+    </div>
+{% endblock %}
