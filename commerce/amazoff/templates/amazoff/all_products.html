@@ -8,7 +8,7 @@
 
         <div class="inventory-grid">
             {% for inv in all_inventories %}
-                <a href="#" class="inventory-item">  <!-- Make the whole box a link -->
+                <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">  <!-- Make the whole box a link -->
                     <div class="inventory-img">
                         <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
                     </div>

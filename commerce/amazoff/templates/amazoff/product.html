@@ -1,0 +1,85 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}{{ product.product.title }}{% endblock %}
+
+{% block content %}
+    <div class="product-container">
+        <div class="product-details">
+            <div class="product-image">
+                <img src="{{ product.product.image.url }}" alt="{{ product.product.title }}">
+            </div>
+            <div class="product-info">
+                <h1 class="product-title">{{ product.product.title }}</h1>
+                <p class="product-price">₹{{ product.product.price }}</p>
+                <p class="product-description">{{ product.product.description }}</p>
+
+                <div class="product-seller">
+                    <p><strong>Seller:</strong> {{ product.associated_with.user_name }}</p>
+                    <p><strong>Contact:</strong> {{ product.associated_with.email }}</p>
+                </div>
+
+                <div class="product-stock">
+                    {% if product.quantity <= 5 %}
+                        <p class="low-stock">⚠️ ONLY {{ product.quantity }} REMAINING</p>
+                    {% else %}
+                        <p class="in-stock">{{ product.quantity }} in stock</p>
+                    {% endif %}
+                </div>
+
+                <form method="POST" action="{% url 'addtocart' product.product.product_id %}" class="cart-form">
+                    {% csrf_token %}
+                    <div class="quantity-container">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ product.quantity }}" value="1" class="quantity-input">
+                    </div>
+
+                    <button type="submit" class="btn-cart">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Similar Products Section -->
+        <h2 class="similar-title">Similar Products</h2>
+        <div class="similar-products">
+            {% for similar in similar_products %}
+                <a href="{% url 'product' similar.inventory_id %}" class="similar-item">
+                    <img src="{{ similar.product.image.url }}" alt="{{ similar.product.title }}">
+                    <div class="similar-info">
+                        <h3>{{ similar.product.title }}</h3>
+                        <p>₹{{ similar.product.price }}</p>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="empty-text">No similar products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+        .cart-form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .quantity-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity-container label {
+            font-weight: bold;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+{% endblock %}

@@ -25,7 +25,19 @@ SECRET_KEY = 'django-insecure-7b&2=#3_(xy0rl2_ghvj5@xiy)n0!&sl_w5t77%39hub46gp=n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "amazoff.shop",
+    "www.amazoff.shop",
+    "127.0.0.1",
+    "localhost",
+    "plan-developments-clarke-russia.trycloudflare.com"  # Removed trailing "/"
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://www.amazoff.shop",
+    "https://amazoff.shop",
+    "https://plan-developments-clarke-russia.trycloudflare.com"  # Removed trailing "/"
+]
 
 
 # Application definition

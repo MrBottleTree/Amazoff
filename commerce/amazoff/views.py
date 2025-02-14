@@ -17,6 +17,7 @@ def common_navbar_data(request):
         )
     addresses = address.objects.filter(associated_with=person)
     city = ""
+    categories = category.objects.all()
     if addresses:
         city = addresses[0].city
     return {
@@ -24,6 +25,7 @@ def common_navbar_data(request):
         'name': request.user.username.capitalize(),
         'balance': person.wallet,
         'items_in_cart': len(items_in_cart),
+        'categories': categories
     }
 
 def home(request):
@@ -153,11 +155,13 @@ def addproduct(request):
         description = request.POST["description"]
         price = request.POST["price"]
         companyid = request.POST["company"]
+        cat = request.POST["category"]
+        cat = category.objects.get(name=cat)
         image = request.FILES.get("image")
         if not title or not description or not price or not image:
             return HttpResponseRedirect(reverse("addproduct"))
         person = people.objects.get(user_name=request.user.username)
-        item = product(title=title, description=description, price=price, image=image, seller=person, company=company.objects.get(company_id=companyid))
+        item = product(title=title, description=description, price=price, image=image, seller=person, company=company.objects.get(company_id=companyid), category = cat)
         item.save()
         return HttpResponseRedirect(reverse("addinventory"))
     navs = common_navbar_data(request)
@@ -167,9 +171,75 @@ def addproduct(request):
     return render(request, 'amazoff/add_product.html', navs)
 
 def allproducts(request, search = ''):
-    all_inventories = inventory.objects.all()
+    if search != '':
+        all_inventories = [inv for inv in inventory.objects.all() if search.lower() in inv.product.category.name.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.product.title.lower()]
+    else:
+        search = request.GET.get('q', '')
+        if search != '':
+            all_inventories = [inv for inv in inventory.objects.all() if search.lower() in inv.product.category.name.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.product.title.lower()]
+        else:
+            all_inventories = inventory.objects.all()
     navs = common_navbar_data(request)
     navs.update({
         "all_inventories":all_inventories
     })
     return render(request, "amazoff/all_products.html", navs)
+
+def viewproduct(request, inventory_id):
+    item = inventory.objects.get(inventory_id=inventory_id)
+    navs = common_navbar_data(request)
+    similar_products = [inv for inv in inventory.objects.all() if inv.product.category == item.product.category and inv != item]
+    navs.update({
+        "product":item,
+        "similar_products":similar_products
+    })
+    return render(request, "amazoff/product.html", navs)
+
+def _cart(request, id = -1):
+    if(request.method == "POST"):
+        person = people.objects.get(user_name=request.user.username)
+        _cart, ncreated = cart.objects.get_or_create(buyer=person)
+        if ncreated:
+            print("creating")
+            _cart = cart(buyer=person)
+            _cart.save()
+        item_response = request.POST["quantity"]
+        cartitem = cartitems(cart=_cart, product=product.objects.get(product_id=id), quantity=item_response)
+        cartitem.save()
+        return HttpResponseRedirect(reverse("viewcart"))
+    cart_items = cartitems.objects.filter(cart=cart.objects.get(buyer=people.objects.get(user_name=request.user.username)))
+    total_price = 0
+    for item in cart_items:
+        total_price += item.product.price * item.quantity
+    navs = common_navbar_data(request)
+    similar_products = []
+    for item in cart_items:
+        similar_products += [inv for inv in inventory.objects.all() if inv.product.category == item.product.category and inv != item]
+    similar_products = list(set(similar_products))
+    if similar_products == []:
+        similar_products = inventory.objects.all()
+    navs.update({
+        "cart_items":cart_items,
+        "similar_products":similar_products,
+        "cart_total":total_price
+    })
+    return render(request, "amazoff/cart.html", navs)
+
+def remove(request, id):
+    cart_item = cartitems.objects.get(id=id)
+    cart_item.delete()
+    return HttpResponseRedirect(reverse("viewcart"))
+
+def checkout(request):
+    cart_items = cartitems.objects.filter(cart=cart.objects.get(buyer=people.objects.get(user_name=request.user.username)))
+    total_price = 52.78
+    for item in cart_items:
+        total_price += float(item.product.price) * float(item.quantity)
+    navs = common_navbar_data(request)
+    wallet_balance = people.objects.get(user_name=request.user.username).wallet
+    navs.update({
+        "cart_items":cart_items,
+        "cart_total":round(total_price, 2),
+        "wallet_balance":wallet_balance
+    })
+    return render(request, "amazoff/checkout.html", navs)

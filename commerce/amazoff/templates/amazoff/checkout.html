@@ -1,0 +1,194 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+    <div class="checkout-container">
+        <!-- Left Side: Cart Items -->
+        <div class="checkout-left">
+            <h2 class="section-title">Order Summary</h2>
+            {% if cart_items %}
+                {% for item in cart_items %}
+                    <div class="cart-item">
+                        <div class="cart-item-img">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}">
+                        </div>
+                        <div class="cart-item-info">
+                            <h3>{{ item.product.title }}</h3>
+                            <p><strong>Price:</strong> ₹{{ item.product.price }}</p>
+                            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-cart">Your cart is empty! 😔</p>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Price Breakdown -->
+        <div class="checkout-right">
+            <h2 class="section-title">Price Breakdown</h2>
+            <div class="price-details">
+                {% for item in cart_items %}
+                    <div class="price-row">
+                        <span class="price-item">{{ item.product.title }}</span>
+                        <span class="price-cost">₹{{ item.product.price }} × {{ item.quantity }}</span>
+                    </div>
+                {% endfor %}
+                <hr>
+                <div class="price-row">
+                    <span class="price-item">Delivery Charge</span>
+                    <span class="price-cost">₹52.78</span>
+                </div>
+                <hr>
+                <div class="price-row total">
+                    <span class="price-item">Total</span>
+                    <span class="price-cost">₹{{ cart_total }}</span>
+                </div>
+                <p class="wallet-balance">Wallet Balance: ₹{{ wallet_balance }}</p>
+                <form method="POST" action="#">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-checkout" {% if wallet_balance < cart_total %}disabled{% endif %}>
+                        Checkout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Checkout Container */
+        .checkout-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: auto;
+            padding: 2rem;
+            background: var(--background-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Left Side: Order Summary */
+        .checkout-left {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            background: var(--secondary-color);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .cart-item:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        .cart-item-img img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+        }
+
+        .cart-item-info {
+            flex: 1;
+            margin-left: 1rem;
+            text-align: left;
+        }
+
+        .cart-item-info h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-info p {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 5px 0;
+        }
+
+        /* Right Side: Price Breakdown */
+        .checkout-right {
+            width: 350px;
+            padding: 1.5rem;
+            background: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .price-details {
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .wallet-balance {
+            margin-top: 1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .btn-checkout {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-color);
+            color: white;
+            font-size: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.8rem;
+        }
+
+        .btn-checkout:disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+
+        .btn-checkout:hover:not(:disabled) {
+            background: var(--hover-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .checkout-container {
+                flex-direction: column;
+            }
+
+            .checkout-right {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}

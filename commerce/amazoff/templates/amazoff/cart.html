@@ -1,0 +1,268 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+    <div class="cart-container">
+        <h1 class="cart-title">Your Shopping Cart</h1>
+
+        {% if cart_items %}
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="cart-item-img">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}">
+                    </div>
+                    <div class="cart-item-info">
+                        <h3>{{ item.product.title }}</h3>
+                        <p><strong>Price:</strong> ₹{{ item.product.price }}</p>
+                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                    </div>
+                    <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="cart-item-remove">✖</button>
+                    </form>
+                </div>
+            {% endfor %}
+
+            <div class="cart-summary">
+                <h2 class="cart-total">Total: ₹{{ cart_total }}</h2>
+                <a href = "{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout</a>
+            </div>
+        {% else %}
+            <div class="empty-cart">
+                <p>Your cart is empty! 😔</p>
+                <a href="{% url 'allproducts' %}" class="btn-add-items">Add Items</a>
+            </div>
+        {% endif %}
+
+        <!-- Similar Products Section -->
+        <h2 class="similar-title">You May Also Like</h2>
+        <div class="similar-products">
+            {% for similar in similar_products %}
+                <a href="{% url 'product' similar.inventory_id %}" class="similar-item">
+                    <img src="{{ similar.product.image.url }}" alt="{{ similar.product.title }}">
+                    <div class="similar-info">
+                        <h3>{{ similar.product.title }}</h3>
+                        <p>₹{{ similar.product.price }}</p>
+                    </div>
+                </a>
+            {% empty %}
+                <p class="empty-text">No recommendations available.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+        /* Cart Container */
+        .cart-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 2rem;
+            background: var(--background-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .cart-title {
+            text-align: left;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Cart Item Card */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            background: var(--secondary-color);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .cart-item:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        /* Product Image */
+        .cart-item-img img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+        }
+
+        /* Product Details */
+        .cart-item-info {
+            flex: 1;
+            margin-left: 1rem;
+            text-align: left;
+        }
+
+        .cart-item-info h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .btn-add-items {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .btn-add-items:hover {
+            background: var(--hover-color);
+        }
+
+        .cart-item-info p {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 5px 0;
+        }
+
+        /* Remove Button */
+        .cart-item-remove {
+            background: rgba(255, 0, 0, 0.2);
+            color: red;
+            border: none;
+            padding: 8px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cart-item-remove:hover {
+            background: rgba(255, 0, 0, 0.4);
+        }
+
+        /* Cart Summary */
+        .cart-summary {
+            text-align: right;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+        }
+
+        .cart-total {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        /* Checkout Button */
+        .btn-checkout {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-color);
+            color: white;
+            font-size: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.8rem;
+        }
+
+        .btn-checkout:hover {
+            background: var(--hover-color);
+        }
+
+        /* Empty Cart Message */
+        .empty-cart {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        /* Similar Products Section */
+        .similar-title {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .similar-products {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+
+        .similar-item {
+            background: var(--secondary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            min-width: 160px;
+        }
+
+        .similar-item:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        .similar-item img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .similar-info h3 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .similar-info p {
+            font-size: 1rem;
+            color: green;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .cart-item-img img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .cart-summary {
+                text-align: center;
+                margin-top: 1rem;
+            }
+
+            .similar-products {
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}

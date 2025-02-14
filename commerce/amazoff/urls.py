@@ -12,5 +12,10 @@ urlpatterns = [
     path("addinventory", views.addinventory, name="addinventory"),
     path("addproduct", views.addproduct, name="addproduct"),
     path("allproducts", views.allproducts, name="allproducts"),
-    path("allproducts/<str:search>", views.allproducts, name="searchproducts")
+    path("allproducts/<str:search>", views.allproducts, name="searchproducts"),
+    path("product/<int:inventory_id>", views.viewproduct, name="product"),
+    path("cart/<int:id>", views._cart, name="addtocart"),
+    path("cart", views._cart, name="viewcart"),
+    path("remove/<int:id>", views.remove, name="remove_from_cart"),
+    path("checkout", views.checkout, name="checkout"),
 ]

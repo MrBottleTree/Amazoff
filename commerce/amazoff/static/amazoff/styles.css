@@ -82,22 +82,6 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.search-container {
-    flex: 1;
-    max-width: 700px;
-    display: flex;
-    align-items: center;
-    background: var(--secondary-color);
-    border-radius: 12px;
-    border: 2px solid var(--accent-color);
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.search-container:focus-within {
-    box-shadow: var(--shadow-md);
-}
-
 .category-dropdown select {
     height: 40px;
     border: none;
@@ -107,38 +91,6 @@ body {
     font-size: 0.9rem;
     cursor: pointer;
     appearance: none;
-}
-
-.search-input {
-    flex: 1;
-    height: 40px;
-    border: none;
-    padding: 0 1rem;
-    font-size: 1rem;
-    color: var(--text-color);
-    background: var(--secondary-color);
-}
-
-.search-input:focus {
-    outline: none;
-}
-
-.search-btn {
-    height: 40px;
-    width: 50px;
-    border: none;
-    background: var(--accent-color);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.search-btn:hover {
-    background: var(--hover-color);
-}
-
-.search-btn i {
-    color: white;
-    font-size: 1.1rem;
 }
 
 .nav-right {
@@ -901,5 +853,179 @@ textarea {
 @media (max-width: 768px) {
     .inventory-grid {
         grid-template-columns: 1fr;
+    }
+}
+.product-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Product Details */
+.product-details {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    background: var(--background-color);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+/* Product Image */
+.product-image img {
+    width: 300px; /* Fixed width */
+    height: 300px; /* Fixed height */
+    object-fit: cover; /* Ensures uniformity */
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Product Info */
+.product-info {
+    text-align: left;
+    flex: 1;
+}
+
+.product-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    color: green;
+    margin-bottom: 1rem;
+}
+
+.product-description {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Seller Info */
+.product-seller p {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+/* Stock Information */
+.product-stock p {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.low-stock {
+    color: red;
+}
+
+.in-stock {
+    color: green;
+}
+
+/* Buy & Add to Cart Buttons */
+.product-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-buy, .btn-cart {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    text-align: center;
+}
+
+/* Updated Buy Now Button */
+.btn-buy {
+    background: var(--primary-color); /* Dark Gray (Blends with theme) */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.btn-cart {
+    background: var(--accent-color); /* Existing color */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--transition);
+    text-align: center;
+}
+
+/* Hover Effects */
+.btn-buy:hover, .btn-cart:hover {
+    opacity: 0.85;
+}
+
+
+/* Similar Products Section */
+.similar-title {
+    font-size: 1.8rem;
+    margin-top: 3rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+}
+
+.similar-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.similar-item {
+    background: var(--secondary-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.similar-item:hover {
+    background: var(--hover-color);
+    transform: translateY(-2px);
+}
+
+.similar-item img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.similar-info h3 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.similar-info p {
+    font-size: 1rem;
+    color: green;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-details {
+        flex-direction: column;
+        text-align: center;
     }
 }

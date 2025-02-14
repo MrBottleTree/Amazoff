@@ -28,20 +28,29 @@
             </div>
 
             <!-- Center Section: Search Bar -->
-            <div class="search-container">
-                <div class="category-dropdown">
-                    <select>
-                        <option>All Categories</option>
-                        <option>Electronics</option>
-                        <option>Fashion</option>
-                        <option>Home & Kitchen</option>
-                    </select>
-                </div>
-                <input type="text" placeholder="Search products..." class="search-input">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
+            <div class="search-container" style="display: flex; align-items: center; background: var(--secondary-color); border-radius: 12px; border: 2px solid var(--accent-color); overflow: hidden; transition: var(--transition); max-width: 700px; flex: 1;">
+    
+                <!-- Category Dropdown -->
+                <select onchange="window.location.href=this.value;" style="height: 40px; border: none; background: var(--primary-color); color: white; padding: 0 1.5rem; font-size: 0.9rem; cursor: pointer; appearance: none;">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="{% url 'allproducts' %}">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{% url 'searchproducts' cat %}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            
+                <!-- Search Form -->
+                <form action="{% url 'allproducts' %}" method="GET" style="display: flex; flex: 1;">
+                    <input type="text" name="q" placeholder="Search products..." class="search-input" 
+                        style="flex: 1; height: 40px; border: none; padding: 0 1rem; font-size: 1rem; color: var(--text-color); background: var(--secondary-color); outline: none;">
+                    <button type="submit" class="search-btn" 
+                        style="height: 40px; width: 50px; border: none; background: var(--accent-color); cursor: pointer; transition: var(--transition);">
+                        <i class="fas fa-search" style="color: white; font-size: 1.1rem;"></i>
+                    </button>
+                </form>
+            
             </div>
+            
 
             <!-- Right Section: Wallet, User & Cart -->
             <div class="nav-right">
@@ -67,7 +76,7 @@
                 </div>
 
                 <!-- Cart Icon (Updated) -->
-                <a href="#" class="cart-icon">
+                <a href="{% url 'viewcart' %}" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i> <!-- Updated icon -->
                     <span class="cart-count">{{items_in_cart}}</span>
                 </a>
