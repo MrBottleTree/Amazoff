@@ -47,7 +47,6 @@ class orders(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=False)
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.PENDING)
     buyer = models.ForeignKey(people, on_delete=models.CASCADE, related_name="orders_placed")
-    shipped_from = models.ForeignKey(address, on_delete=models.CASCADE, related_name="shipped_from")
     shipped_to = models.ForeignKey(address, on_delete=models.CASCADE, related_name="shipped_to")
 
     def __str__(self):
@@ -71,6 +70,8 @@ class product(models.Model):
     image = models.ImageField(upload_to='product_images/', null=True)
     company = models.ForeignKey(company, on_delete=models.CASCADE, related_name="products")
     category = models.ForeignKey(category, on_delete=models.CASCADE, related_name="products", null=True)
+    review = models.IntegerField(default=0)
+    number_review = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.title}"
@@ -103,6 +104,8 @@ class orderdetails(models.Model):
     product = models.ForeignKey(product, on_delete=models.CASCADE, related_name="order_details")
     order = models.ForeignKey(orders, on_delete=models.CASCADE, related_name="order_details")
     quantity = models.IntegerField(null=False)
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.PENDING)
+    seller = models.ForeignKey(people, on_delete=models.CASCADE, related_name="orders_fulfilled")
 
     def __str__(self):
         return f"{self.product} x {self.quantity}"
@@ -122,3 +125,21 @@ class cartitems(models.Model):
 
     def __str__(self):
         return f"{self.product} x {self.quantity}"
+    
+class notifications(models.Model):
+    notification_id = models.AutoField(primary_key=True)
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.PENDING)
+    created_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(people, on_delete=models.CASCADE, related_name="notifications")
+    orderdetail = models.ForeignKey(orderdetails, on_delete=models.CASCADE, related_name="notifications")
+    read = models.BooleanField(default=False)
+
+class reviews(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(people, on_delete=models.CASCADE, related_name="user_reviews")
+    product = models.ForeignKey(product, on_delete=models.CASCADE, related_name="product_reviews")
+    rating = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
+    comment = models.CharField(max_length=10000, null = False)

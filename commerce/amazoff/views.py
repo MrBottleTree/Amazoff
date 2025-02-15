@@ -6,31 +6,41 @@ from django.urls import reverse
 from django.contrib import messages
 from .models import *
 
-def common_navbar_data(request):
-    person = people.objects.get(user_name=request.user.username)
-    items_in_cart = cartitems.objects.filter(
-        cart=cart.objects.get(
-            buyer=people.objects.get(
-                user_name=request.user.username
+def common_navs_data(request):
+    try:
+        person = people.objects.get(user_name=request.user.username)
+        items_in_cart = cartitems.objects.filter(
+            cart=cart.objects.get(
+                buyer=people.objects.get(
+                    user_name=request.user.username
+                    )
                 )
             )
-        )
-    addresses = address.objects.filter(associated_with=person)
-    city = ""
-    categories = category.objects.all()
-    if addresses:
-        city = addresses[0].city
-    return {
-        'city': city,
-        'name': request.user.username.capitalize(),
-        'balance': person.wallet,
-        'items_in_cart': len(items_in_cart),
-        'categories': categories
-    }
+        addresses = address.objects.filter(associated_with=person)
+        city = ""
+        categories = category.objects.all()
+        if addresses:
+            city = addresses[0].city
+        temp1 = list(notifications.objects.filter(user=person))
+        temp2 = list(notifications.objects.filter(orderdetail__seller=person))
+        temp = [t1 for t1 in temp1 if not t1.read] + [t2 for t2 in temp2 if t2.status == Status.PENDING]
+        return {
+            'city': city,
+            'name': request.user.username,
+            'balance': person.wallet,
+            'items_in_cart': len(items_in_cart),
+            'categories': categories,
+            'numnot': len(set(temp))
+        }
+    except:
+        return {}
 
 def home(request):
     if request.user.is_authenticated:
-        return render(request, "amazoff/home.html", common_navbar_data(request))
+        if not people.objects.filter(user_name=request.user.username).first():
+            logout(request)
+            return HttpResponseRedirect(reverse("home"))
+        return render(request, "amazoff/home.html", common_navs_data(request))
     else:
         return render(request, "amazoff/login.html", {"message":"To use this website, please login."})
 
@@ -70,25 +80,27 @@ def register_view(request):
             messages.error(request, "Passwords do not match.")
             return redirect("register")
 
-        if User.objects.filter(username=username).exists():
+        if people.objects.filter(user_name=username).exists():
             messages.error(request, "Username already taken.")
             return redirect("register")
 
-        if User.objects.filter(email=email).exists():
+        if people.objects.filter(email=email).exists():
             messages.error(request, "Email already registered.")
             return redirect("register")
-
-        user = User.objects.create_user(username=username, email=email, password=password1)
-        user.save()
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password1)
+            user.save()
+        except:
+            pass
         
-        person = people(user_name=user.username, email=user.email, user_type=usertype)
+        person = people(user_name=username, email=email, user_type=usertype)
+        person.wallet = 100000
         person.save()
         cart(buyer=person).save()
-
+        user = User.objects.get(username=username)
         login(request, user)
         return redirect("home")
     return render(request, "amazoff/register.html")
-
 
 def addmoney(request, amount):
     if request.user.is_authenticated:
@@ -101,18 +113,26 @@ def addmoney(request, amount):
 
 def dashboard(request):
     if request.user.is_authenticated:
+        if not people.objects.filter(user_name=request.user.username).first():
+            logout(request)
+            return HttpResponseRedirect(reverse("home"))
         person = people.objects.get(user_name=request.user.username)
         addresses = address.objects.filter(associated_with=person)
         inventories = inventory.objects.filter(associated_with=person)
-        navbar = common_navbar_data(request)
-        navbar.update({
+        navs = {}
+        try:
+            navs = common_navs_data(request)
+        except:
+            logout(request)
+            return HttpResponseRedirect(reverse("home"))
+        navs.update({
             "email":person.email,
             "user_id":person.user_id,
             "user_type":person.user_type.capitalize(),
             "user_inventory":inventories,
             "user_addresses":addresses
             })
-        return render(request, "amazoff/dashboard.html", navbar)
+        return render(request, "amazoff/dashboard.html", navs)
     else:
         return HttpResponseRedirect(reverse("home"))
 
@@ -128,7 +148,7 @@ def addaddress(request):
             address(associated_with=person, street=street, city=city, state=state, zip_code=zip_code, country=country, address_type = person.user_type).save()
             return HttpResponseRedirect(reverse("dashboard"))
         else:
-            return render(request, "amazoff/add_address.html", common_navbar_data(request))
+            return render(request, "amazoff/add_address.html", common_navs_data(request))
     else:
         return HttpResponseRedirect(reverse("home"))
     
@@ -142,7 +162,7 @@ def addinventory(request):
         item = product.objects.get(product_id=productid)
         inventory(product=item, quantity=quantity, associated_with=person, address = selleraddress).save()
         return HttpResponseRedirect(reverse("dashboard"))
-    navs = common_navbar_data(request)
+    navs = common_navs_data(request)
     navs.update({
         "user_products":product.objects.filter(seller=people.objects.get(user_name=request.user.username)),
         "user_addresses":address.objects.filter(associated_with=people.objects.get(user_name=request.user.username))
@@ -164,7 +184,12 @@ def addproduct(request):
         item = product(title=title, description=description, price=price, image=image, seller=person, company=company.objects.get(company_id=companyid), category = cat)
         item.save()
         return HttpResponseRedirect(reverse("addinventory"))
-    navs = common_navbar_data(request)
+    navs = {}
+    try:
+        navs = common_navs_data(request)
+    except:
+        logout(request)
+        return HttpResponseRedirect(reverse("home"))
     navs.update({
         "companies":company.objects.all()
     })
@@ -179,7 +204,7 @@ def allproducts(request, search = ''):
             all_inventories = [inv for inv in inventory.objects.all() if search.lower() in inv.product.category.name.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.product.title.lower()]
         else:
             all_inventories = inventory.objects.all()
-    navs = common_navbar_data(request)
+    navs = common_navs_data(request)
     navs.update({
         "all_inventories":all_inventories
     })
@@ -187,7 +212,7 @@ def allproducts(request, search = ''):
 
 def viewproduct(request, inventory_id):
     item = inventory.objects.get(inventory_id=inventory_id)
-    navs = common_navbar_data(request)
+    navs = common_navs_data(request)
     similar_products = [inv for inv in inventory.objects.all() if inv.product.category == item.product.category and inv != item]
     navs.update({
         "product":item,
@@ -211,7 +236,7 @@ def _cart(request, id = -1):
     total_price = 0
     for item in cart_items:
         total_price += item.product.price * item.quantity
-    navs = common_navbar_data(request)
+    navs = common_navs_data(request)
     similar_products = []
     for item in cart_items:
         similar_products += [inv for inv in inventory.objects.all() if inv.product.category == item.product.category and inv != item]
@@ -235,11 +260,92 @@ def checkout(request):
     total_price = 52.78
     for item in cart_items:
         total_price += float(item.product.price) * float(item.quantity)
-    navs = common_navbar_data(request)
+    navs = common_navs_data(request)
     wallet_balance = people.objects.get(user_name=request.user.username).wallet
     navs.update({
         "cart_items":cart_items,
         "cart_total":round(total_price, 2),
-        "wallet_balance":wallet_balance
+        "wallet_balance":wallet_balance,
+        "addresses":address.objects.filter(associated_with=people.objects.get(user_name=request.user.username))
     })
     return render(request, "amazoff/checkout.html", navs)
+
+def orderconfirmation(request, id):
+    cart_items = cartitems.objects.filter(cart=cart.objects.get(buyer=people.objects.get(user_name=request.user.username)))
+    total = float(sum([items.product.price * items.quantity for items in cart_items])) + 52.78
+    person = people.objects.get(user_name=request.user.username)
+    person.wallet = float(person.wallet) - total
+    person.save()
+    order = orders(total_amount=total, buyer=person, shipped_to=address.objects.get(address_id=id))
+    order.save()
+    for item in cart_items:
+        orderdetail = orderdetails(order=order, product=item.product, quantity=item.quantity, seller=item.product.seller)
+        orderdetail.save()
+        notifications(user=people.objects.get(user_name=request.user.username), orderdetail=orderdetail).save()
+        item.delete()
+
+    return render(request, "amazoff/order_confirmation.html", common_navs_data(request))
+
+def viewnotifications(request):
+    person = people.objects.get(user_name=request.user.username)
+    temp1 = list(notifications.objects.filter(user=person))
+    temp2 = list(notifications.objects.filter(orderdetail__seller=person))
+    navs = common_navs_data(request)
+    print(person.user_type)
+    navs.update({
+        "b_notifications":[x for x in temp1 if x.read == False ],
+        "s_notifications":[x for x in temp2 if x.status == Status.PENDING],
+        "user":person
+    })
+    return render(request, "amazoff/notifications.html", navs)
+
+def markread(request, id):
+    temp = notifications.objects.get(notification_id=id)
+    temp.read = True
+    temp.save()
+    if temp.status != Status.PENDING:
+        temp.delete()
+    return HttpResponseRedirect(reverse("notifications"))
+
+def updateorderstatus(request, id):
+    notification = notifications.objects.get(notification_id=id)
+    orderdetail = notification.orderdetail
+    post = request.POST
+    if "accept" in post:
+        inv = inventory.objects.get(product=notification.orderdetail.product, associated_with=notification.orderdetail.seller)
+        inv.quantity -= notification.orderdetail.quantity
+        seller = inv.associated_with
+        seller.wallet = float(seller.wallet) + float(notification.orderdetail.quantity)*float(notification.orderdetail.product.price)
+        seller.save()
+        notification.read = False
+        if inv.quantity <= 0:
+            inv.delete()
+        else:
+            inv.save()
+        notification.status = Status.ACCEPTED
+        orderdetail.status = Status.ACCEPTED
+    elif "reject" in post:
+        notification.status = Status.REJECTED
+        orderdetail.status = Status.REJECTED
+        notification.read = False
+        person = notification.user
+        person.wallet = float(person.wallet) + float(notification.orderdetail.quantity) * float(notification.orderdetail.product.price) 
+        person.save()
+    orderdetail.save()
+    notification.save()
+    temporder = orderdetail.order
+    all_details_status = set([detail.status for detail in orderdetails.objects.filter(order = temporder)])
+    if Status.PENDING in all_details_status:
+        temporder.status = Status.PENDING
+    elif Status.REJECTED in all_details_status:
+        temporder.status = Status.REJECTED
+    elif Status.ACCEPTED in all_details_status:
+        temporder.status = Status.ACCEPTED
+    temporder.save()
+    return HttpResponseRedirect(reverse("notifications"))
+
+def vieworderhistory(request):
+    navs = common_navs_data(request)
+    order = orders.objects.filter(buyer = people.objects.get(user_name = request.user.username))
+    navs.update({"orders":order})
+    return render(request, "amazoff/orderhistory.html", navs)

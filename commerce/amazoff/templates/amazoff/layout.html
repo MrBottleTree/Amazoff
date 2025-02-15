@@ -54,9 +54,9 @@
 
             <!-- Right Section: Wallet, User & Cart -->
             <div class="nav-right">
-                
+
                 <!-- Wallet Button -->
-                <a href="{%url 'addmoney' 1000%}" class="wallet-btn">
+                <a href="{%url 'addmoney' 100000%}" class="wallet-btn">
                     <i class="fas fa-wallet"></i>
                     <span>₹{{ balance }}</span>
                 </a>
@@ -69,12 +69,15 @@
                     </a>
                     <div class="dropdown-menu">
                         <a href="{% url 'dashboard' %}"><i class="fas fa-user"></i> Profile</a>
-                        <a href="#"><i class="fas fa-box-open"></i> Orders</a>
-                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="{% url 'orderhistory' %}"><i class="fas fa-box-open"></i> Orders</a>
                         <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
-
+                <!-- Notification Icon -->
+                <a href="{% url 'notifications' %}" class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">{{numnot}}</span>
+                </a>
                 <!-- Cart Icon (Updated) -->
                 <a href="{% url 'viewcart' %}" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i> <!-- Updated icon -->

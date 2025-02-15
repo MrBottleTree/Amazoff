@@ -1,0 +1,63 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+    <div class="notifications-container">
+        <h2>Your Notifications</h2>
+        
+        {% if b_notifications %}
+            <ul class="notification-list">
+                {% for notification in b_notifications %}
+                    
+                    <li class="notification-item">
+                        <!-- Product Image -->
+                        <div class="notification-img">
+                            <img src="{{ notification.orderdetail.product.image.url }}" alt="{{ notification.orderdetail.product.title }}">
+                        </div>
+
+                        <!-- Notification Details -->
+                        <div class="notification-info">
+                            <h3>{{ notification.orderdetail.product.title }}</h3>
+                            <p>Seller: {{ notification.orderdetail.seller.user_name }}</p>
+                            <p class="status {{ notification.status|lower }}">{{ notification.status }}</p>
+                        </div>
+
+                        <!-- Mark as Read Button -->
+                        <a href="{% url 'markread' notification.notification_id %}" class="btn-mark-read">Mark as Read</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-text">No new notifications!</p>
+        {% endif %}
+        
+        {% if s_notifications and user.user_type == 'seller' %}
+            <h3>Pending Order Requests</h3>
+            <ul class="pending-requests">
+                {% for notification in s_notifications %}
+                    <li class="notification-item">
+                        <!-- Product Image -->
+                        <div class="notification-img">
+                            <img src="{{ notification.orderdetail.product.image.url }}" alt="{{ notification.orderdetail.product.title }}">
+                        </div>
+
+                        <!-- Request Details -->
+                        <div class="notification-info">
+                            <h3>{{ notification.orderdetail.product.title }}</h3>
+                            <p>Buyer: {{ notification.user.user_name }}</p>
+                            <p class="status pending">Pending</p>
+                        </div>
+
+                        <!-- Accept/Reject Buttons -->
+                        <form method="POST" action="{% url 'updateorderstatus' notification.notification_id %}">
+                            {% csrf_token %}
+                            <button type="submit" name="accept" class="btn-accept">Accept</button>
+                            <button type="submit" name="reject" class="btn-reject">Reject</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}

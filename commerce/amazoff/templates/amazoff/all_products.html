@@ -8,7 +8,7 @@
 
         <div class="inventory-grid">
             {% for inv in all_inventories %}
-                <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">  <!-- Make the whole box a link -->
+                <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">
                     <div class="inventory-img">
                         <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
                     </div>
@@ -18,6 +18,20 @@
                         <p><strong>Quantity Available:</strong> {{ inv.quantity }}</p>
                         <p><strong>Seller:</strong> {{ inv.associated_with.user_name }}</p>
                         <p><strong>Location:</strong> {{ inv.address.city }}, {{ inv.address.state }}</p>
+                        
+                        <!-- Display Average Rating in Stars -->
+                        <p class="rating">
+                            {% with inv.average_rating|default:2.5 as rating %}
+                                {% for star in "12345" %}
+                                    {% if star <= rating|stringformat:"d" %}
+                                        <i class="fas fa-star star-filled"></i>
+                                    {% else %}
+                                        <i class="far fa-star star-empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span>({{ rating|floatformat:1 }})</span>
+                            {% endwith %}
+                        </p>
                     </div>
                 </a>
             {% empty %}
@@ -25,4 +39,104 @@
             {% endfor %}
         </div>
     </div>
+<style>
+    /* Force 1 Product Per Row */
+.inventory-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Inventory Item (Horizontal View) */
+.inventory-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--text-color);
+    border: 2px solid var(--hover-color);
+    padding: 1rem;
+    width: 100%;
+    height: auto;
+    max-width: 900px;
+    margin: auto; /* Center it */
+}
+
+/* Product Image */
+.inventory-img {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.inventory-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Product Details */
+.inventory-details {
+    flex-grow: 1;
+    padding-left: 1rem;
+    text-align: left;
+}
+
+.inventory-details h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.inventory-details p {
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+/* Rating Stars */
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 1rem;
+}
+
+.star-filled {
+    color: gold;
+}
+
+.star-empty {
+    color: lightgray;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .inventory-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .inventory-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .inventory-details {
+        padding-left: 0;
+        margin-top: 0.5rem;
+    }
+}
+
+</style>
 {% endblock %}

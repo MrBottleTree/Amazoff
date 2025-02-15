@@ -28,32 +28,54 @@
         <!-- Right Side: Price Breakdown -->
         <div class="checkout-right">
             <h2 class="section-title">Price Breakdown</h2>
-            <div class="price-details">
-                {% for item in cart_items %}
+
+            <!-- Checkout Form -->
+            <form id="checkout-form" method="GET">
+                {% csrf_token %}
+
+                <!-- Address Selection -->
+                <div class="address-selection">
+                    <label for="address-select">Select Delivery Address:</label>
+                    <select id="address-select" name="address_id" class="address-dropdown" required>
+                        {% for addr in addresses %}
+                            <option value="{{ addr.address_id }}">{{ addr.street }}, {{ addr.city }}</option>
+                        {% empty %}
+                            <option disabled>No addresses available</option>
+                        {% endfor %}
+                    </select>
+                    <a href="{% url 'addaddress' %}" class="add-address-link">+ Add New Address</a>
+                </div>
+
+                <!-- Price Details -->
+                <div class="price-details">
+                    {% for item in cart_items %}
+                        <div class="price-row">
+                            <span class="price-item">{{ item.product.title }}</span>
+                            <span class="price-cost">₹{{ item.product.price }} × {{ item.quantity }}</span>
+                        </div>
+                    {% endfor %}
+                    <hr>
                     <div class="price-row">
-                        <span class="price-item">{{ item.product.title }}</span>
-                        <span class="price-cost">₹{{ item.product.price }} × {{ item.quantity }}</span>
+                        <span class="price-item">Delivery Charge</span>
+                        <span class="price-cost">₹52.78</span>
                     </div>
-                {% endfor %}
-                <hr>
-                <div class="price-row">
-                    <span class="price-item">Delivery Charge</span>
-                    <span class="price-cost">₹52.78</span>
+                    <hr>
+                    <div class="price-row total">
+                        <span class="price-item">Total</span>
+                        <span class="price-cost">₹{{ cart_total }}</span>
+                    </div>
+                    <p class="wallet-balance">Wallet Balance: ₹{{ wallet_balance }}</p>
                 </div>
-                <hr>
-                <div class="price-row total">
-                    <span class="price-item">Total</span>
-                    <span class="price-cost">₹{{ cart_total }}</span>
-                </div>
-                <p class="wallet-balance">Wallet Balance: ₹{{ wallet_balance }}</p>
-                <form method="POST" action="#">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-checkout" {% if wallet_balance < cart_total %}disabled{% endif %}>
-                        Checkout
-                    </button>
-                </form>
-            </div>
+
+                <!-- Checkout Button -->
+                <button type="submit" class="btn-checkout" {% if wallet_balance < cart_total %}disabled{% endif %}>
+                    Checkout
+                </button>
+            </form>
         </div>
+
+
+
     </div>
 
     <style>
@@ -191,4 +213,16 @@
             }
         }
     </style>
+    {% block extra_js %}
+    <script>
+        document.getElementById("checkout-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+            let selectedAddress = document.getElementById("address-select").value;
+            if (selectedAddress) {
+                window.location.href = `/orderconfirmation/${selectedAddress}/`; // Redirect to dynamic URL
+            }
+        });
+    </script>
+    {% endblock %}
+    
 {% endblock %}
