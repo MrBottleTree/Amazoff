@@ -22,5 +22,17 @@ urlpatterns = [
     path("notifications", views.viewnotifications, name="notifications"),
     path("markread/<int:id>", views.markread, name="markread"),
     path("updateorderstatus/<int:id>", views.updateorderstatus, name="updateorderstatus"),
-    path("orderhistory", views.vieworderhistory, name="orderhistory")
+    path("orderhistory", views.vieworderhistory, name="orderhistory"),
+    path("review/<int:id>", views._review, name="review"),
+    path("allreviews/<int:id>", views.allreviews, name="allreviews"),
+]
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import StaticViewSitemap
+
+sitemaps = {
+    'static': StaticViewSitemap,
+}
+
+urlpatterns += [
+    path("sitemap.xml", sitemap, {'sitemaps': sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
 ]

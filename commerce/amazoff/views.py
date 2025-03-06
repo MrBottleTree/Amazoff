@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.contrib import messages
 from .models import *
+import random
 
 def common_navs_data(request):
     try:
@@ -201,12 +202,20 @@ def allproducts(request, search = ''):
     else:
         search = request.GET.get('q', '')
         if search != '':
-            all_inventories = [inv for inv in inventory.objects.all() if search.lower() in inv.product.category.name.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.product.title.lower()]
+            all_inventories = [inv for inv in inventory.objects.all() if search.lower() in inv.product.category.name.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.product.title.lower()] + [inv for inv in inventory.objects.all() if search.lower() in inv.associated_with.user_name.lower()]
         else:
             all_inventories = inventory.objects.all()
+    for x in all_inventories:
+        item = x.product
+        rev = review.objects.filter(product=item)
+        item.review = sum([r.rating for r in rev])/len(rev) if len(rev) > 0 else 0
+        item.number_review = len(rev)
+        item.save()
+    all_inventories = list(all_inventories)
+    random.shuffle(all_inventories)
     navs = common_navs_data(request)
     navs.update({
-        "all_inventories":all_inventories
+        "all_inventories":all_inventories,
     })
     return render(request, "amazoff/all_products.html", navs)
 
@@ -216,7 +225,8 @@ def viewproduct(request, inventory_id):
     similar_products = [inv for inv in inventory.objects.all() if inv.product.category == item.product.category and inv != item]
     navs.update({
         "product":item,
-        "similar_products":similar_products
+        "similar_products":similar_products,
+        "reviews": review.objects.filter(product=item.product)
     })
     return render(request, "amazoff/product.html", navs)
 
@@ -300,7 +310,10 @@ def viewnotifications(request):
     return render(request, "amazoff/notifications.html", navs)
 
 def markread(request, id):
-    temp = notifications.objects.get(notification_id=id)
+    temp = notifications.objects.filter(notification_id=id)
+    if not temp:
+        return HttpResponseRedirect(reverse("notifications"))
+    temp = temp[0]
     temp.read = True
     temp.save()
     if temp.status != Status.PENDING:
@@ -346,6 +359,47 @@ def updateorderstatus(request, id):
 
 def vieworderhistory(request):
     navs = common_navs_data(request)
-    order = orders.objects.filter(buyer = people.objects.get(user_name = request.user.username))
-    navs.update({"orders":order})
+    allorder = orders.objects.filter(buyer = people.objects.get(user_name = request.user.username))
+    for order in allorder:
+        all_details_status = set([detail.status for detail in orderdetails.objects.filter(order = order)])
+        if Status.PENDING in all_details_status:
+            order.status = Status.PENDING
+        elif Status.REJECTED in all_details_status:
+            order.status = Status.REJECTED
+        elif Status.ACCEPTED in all_details_status:
+            order.status = Status.ACCEPTED
+        order.save()
+    if allorder:
+        allorder = allorder.order_by('-order_id')
+    navs.update({"orders":allorder})
     return render(request, "amazoff/orderhistory.html", navs)
+
+def _review(request, id):
+    item = product.objects.get(product_id=id)
+    existing_review = review.objects.filter(product=item, buyer=people.objects.get(user_name=request.user.username)).first()
+    if request.method == "POST":
+        rating = int(request.POST["rating"])
+        comment = request.POST["comment"]
+        if existing_review:
+            existing_review.rating = rating
+            existing_review.comment = comment
+            existing_review.save()
+        else:
+            inrev = review(rating=rating, comment=comment, product=item, buyer=people.objects.get(user_name=request.user.username))
+            inrev.save()
+        reviews = review.objects.filter(product=item)
+        avg_review = sum([rev.rating for rev in reviews])/len(reviews)
+        item.review = avg_review
+        item.number_review = len(reviews)
+        return HttpResponseRedirect(reverse("orderhistory"))
+    navs = common_navs_data(request)
+    navs.update({"review":existing_review, "product":item})
+    return render(request, "amazoff/review.html", navs)
+
+def allreviews(request, id):
+    inv = inventory.objects.get(inventory_id=id)
+    item = inv.product
+    revs = review.objects.filter(product=item)
+    navs = common_navs_data(request)
+    navs.update({"reviews":revs, "product":inv})
+    return render(request, "amazoff/allreviews.html", navs)

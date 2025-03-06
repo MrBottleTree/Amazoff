@@ -10,6 +10,21 @@
             </div>
             <div class="product-info">
                 <h1 class="product-title">{{ product.product.title }}</h1>
+
+                <!-- Star Ratings -->
+                <div class="rating">
+                    {% with product.product.review|default:0 as rating %}
+                        {% for star in "12345" %}
+                            {% if star <= rating|stringformat:"d" %}
+                                <i class="fas fa-star star-filled"></i>
+                            {% else %}
+                                <i class="far fa-star star-empty"></i>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                    <span>({{ product.product.number_review }} reviews)</span>
+                </div>
+
                 <p class="product-price">₹{{ product.product.price }}</p>
                 <p class="product-description">{{ product.product.description }}</p>
 
@@ -38,6 +53,35 @@
             </div>
         </div>
 
+        <!-- Reviews Section -->
+        {% if reviews %}
+            <h2 class="reviews-title">Customer Reviews</h2>
+            <div class="reviews-section">
+                {% for review in reviews|slice:":3" %}
+                    <div class="review-item">
+                        <p class="review-user"><strong>Reviewed by: {{ review.buyer.user_name }}</strong></p>
+
+                        <!-- Star Rating -->
+                        <p class="review-rating">
+                            {% for star in "12345" %}
+                                {% if star <= review.rating|stringformat:"d" %}
+                                    <i class="fas fa-star star-filled"></i>
+                                {% else %}
+                                    <i class="far fa-star star-empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+
+                        <p class="review-comment">"{{ review.comment }}"</p>
+                        <p class="review-date">{{ review.review_date|date:"F d, Y" }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+        <!-- View All Reviews Button -->
+        <a href="{% url 'allreviews' product.inventory_id %}" class="btn-view-all">View All Reviews</a>
+        {% endif %}
+        
         <!-- Similar Products Section -->
         <h2 class="similar-title">Similar Products</h2>
         <div class="similar-products">
@@ -56,6 +100,68 @@
     </div>
 
     <style>
+        /* Star Ratings */
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .star-filled {
+            color: gold;
+        }
+        .review-date {
+            font-size: 0.9rem;
+            color: gray;
+        }
+        .star-empty {
+            color: lightgray;
+        }
+
+        /* Review Section */
+        .reviews-section {
+            background: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .review-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--hover-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .review-user {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .review-comment {
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .btn-view-all {
+            display: block;
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: white;
+            background: var(--accent-color);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn-view-all:hover {
+            background: var(--hover-color);
+        }
+
+        /* Cart Form */
         .cart-form {
             display: flex;
             align-items: center;

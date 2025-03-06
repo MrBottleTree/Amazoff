@@ -1,24 +1,17 @@
+{% extends "amazoff/base.html" %}
 {% load static %}
+
+{% block title %}Amazoff - Layout{% endblock %}
+
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazoff - {% block title %}{% endblock %}</title>
-    
-    <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    {% block extra_css %}{% endblock %}
-</head>
+{% block remaining %}
 <body>
 
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
             
-            <!-- Left Section: Logo & Location -->
             <div class="nav-left">
                 <a href="{% url 'home' %}" class="logo">Amazoff</a>
                 <a href="#" class="location-btn">
@@ -27,10 +20,8 @@
                 </a>
             </div>
 
-            <!-- Center Section: Search Bar -->
             <div class="search-container" style="display: flex; align-items: center; background: var(--secondary-color); border-radius: 12px; border: 2px solid var(--accent-color); overflow: hidden; transition: var(--transition); max-width: 700px; flex: 1;">
     
-                <!-- Category Dropdown -->
                 <select onchange="window.location.href=this.value;" style="height: 40px; border: none; background: var(--primary-color); color: white; padding: 0 1.5rem; font-size: 0.9rem; cursor: pointer; appearance: none;">
                     <option value="" disabled selected>Select Category</option>
                     <option value="{% url 'allproducts' %}">All Categories</option>
@@ -39,7 +30,6 @@
                     {% endfor %}
                 </select>
             
-                <!-- Search Form -->
                 <form action="{% url 'allproducts' %}" method="GET" style="display: flex; flex: 1;">
                     <input type="text" name="q" placeholder="Search products..." class="search-input" 
                         style="flex: 1; height: 40px; border: none; padding: 0 1rem; font-size: 1rem; color: var(--text-color); background: var(--secondary-color); outline: none;">
@@ -52,16 +42,13 @@
             </div>
             
 
-            <!-- Right Section: Wallet, User & Cart -->
             <div class="nav-right">
 
-                <!-- Wallet Button -->
                 <a href="{%url 'addmoney' 100000%}" class="wallet-btn">
                     <i class="fas fa-wallet"></i>
                     <span>₹{{ balance }}</span>
                 </a>
 
-                <!-- User Dropdown -->
                 <div class="user-dropdown">
                     <a href="{% url 'dashboard' %}" class="username">
                         <i class="fas fa-user-circle"></i>
@@ -73,29 +60,26 @@
                         <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
-                <!-- Notification Icon -->
                 <a href="{% url 'notifications' %}" class="notification-icon">
                     <i class="fas fa-bell"></i>
                     <span class="notification-count">{{numnot}}</span>
                 </a>
-                <!-- Cart Icon (Updated) -->
                 <a href="{% url 'viewcart' %}" class="cart-icon">
-                    <i class="fas fa-shopping-cart"></i> <!-- Updated icon -->
+                    <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">{{items_in_cart}}</span>
                 </a>
 
-            </div> <!-- End of nav-right -->
-        </div> <!-- End of nav-container -->
+            </div>
+        </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="main-content">
         {% block content %}
-        <!-- Page content goes here -->
         {% endblock %}
     </main>
 
     {% block extra_js %}{% endblock %}
     
 </body>
+{% endblock %}
 </html>

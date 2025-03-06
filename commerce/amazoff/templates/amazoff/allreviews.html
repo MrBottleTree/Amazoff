@@ -1,0 +1,144 @@
+{% extends "amazoff/layout.html" %}
+
+{% block title %}Reviews for {{ product.product.title }}{% endblock %}
+
+{% block content %}
+    <div class="reviews-container">
+        <!-- Product Section -->
+        <div class="product-header">
+            <img src="{{ product.product.image.url }}" alt="{{ product.product.title }}" class="product-img">
+            <div class="product-info">
+                <h1 class="product-title">{{ product.product.title }}</h1>
+                <p class="product-price">₹{{ product.product.price }}</p>
+                <a href="{% url 'product' product.inventory_id %}" class="btn-back">← Back to Product</a>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <h2 class="reviews-title">All Reviews</h2>
+        <div class="reviews-section">
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <p class="review-user"><strong>Reviewed by: {{ review.buyer.user_name }}</strong></p>
+
+                        <!-- Star Rating -->
+                        <p class="review-rating">
+                            {% for star in "12345" %}
+                                {% if star <= review.rating|stringformat:"d" %}
+                                    <i class="fas fa-star star-filled"></i>
+                                {% else %}
+                                    <i class="far fa-star star-empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+
+                        <p class="review-comment">"{{ review.comment }}"</p>
+                        <p class="review-date">{{ review.review_date|date:"F d, Y" }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-text">No reviews yet for this product.product.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        .reviews-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--background-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Product Header */
+        .product-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-info h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: green;
+            font-weight: bold;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-back:hover {
+            background: var(--hover-color);
+        }
+
+        /* Review Section */
+        .reviews-section {
+            background: var(--secondary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .review-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--hover-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .review-user {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .review-comment {
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .review-date {
+            font-size: 0.9rem;
+            color: gray;
+        }
+
+        /* Star Ratings */
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .star-filled {
+            color: gold;
+        }
+
+        .star-empty {
+            color: lightgray;
+        }
+    </style>
+{% endblock %}

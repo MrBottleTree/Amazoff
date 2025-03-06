@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazoff - {% block title %}{% endblock %}</title>
+    <meta property="og:title" content="Amazoff - Student Marketplace">
+    <meta property="og:description" content="A marketplace for BITS Goa students to buy and sell items easily.">
+    <meta property="og:url" content="https://amazoff.shop">
+    <meta property="og:type" content="website">
+    <meta name="description" content="Amazoff is the best online marketplace for BITS Goa students to buy and sell items easily.">
+    <meta name="keywords" content="Amazoff, BITS Goa, buy sell, student marketplace, e-commerce, second-hand items">
+    <meta name="author" content="Amazoff Team">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/x-icon" href="{% static 'amazoff/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'amazoff/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="google-site-verification" content="D4pxa2PftZ1MkG5GFtTrczmCUhtYic-XV53R6RU9l6E" />
+    {% block extra_css %}{% endblock %}
+</head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BKQT06K1X8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BKQT06K1X8');
+</script>
+</html>
+{% block remaining %}
+{% endblock %}

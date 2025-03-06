@@ -27,12 +27,11 @@
                                         <p><strong>Seller:</strong> {{ detail.seller.user_name }}</p>
                                         <p class="status {{ detail.status|lower }}">{{ detail.get_status_display }}</p>
 
-                                        <!-- Review Buttons for Accepted Orders -->
                                         {% if detail.status == "accepted" %}
                                             {% if detail.product.product_id in review_dict %}
-                                                <a href="#" class="btn-review change">Change Review</a>
+                                                <a href="{% url 'review' detail.product.product_id %}" class="btn-review change">Change Review</a>
                                             {% else %}
-                                                <a href="#" class="btn-review add">Add Review</a>
+                                                <a href="{% url 'review' detail.product.product_id %}" class="btn-review add">Add Review</a>
                                             {% endif %}
                                         {% endif %}
                                     </div>

@@ -50,7 +50,7 @@ class orders(models.Model):
     shipped_to = models.ForeignKey(address, on_delete=models.CASCADE, related_name="shipped_to")
 
     def __str__(self):
-        return f"{self.order_id}: placed by {self.buyer} on {self.order_date} for ${self.total_amount}"
+        return f"{self.order_id}: placed by {self.buyer} on {self.order_date} for ₹{self.total_amount}"
 
 class company(models.Model):
     company_id = models.AutoField(primary_key=True)

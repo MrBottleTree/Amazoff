@@ -14,6 +14,8 @@ SECRET_KEY = 'django-insecure-7b&2=#3_(xy0rl2_ghvj5@xiy)n0!&sl_w5t77%39hub46gp=n
 DEBUG = True  # Set to False for production
 
 ALLOWED_HOSTS = [
+    # 'bits-pilani.store',
+    # 'www.bits-pilani.store'
     "amazoff.shop",
     "www.amazoff.shop",
     "127.0.0.1",
@@ -22,6 +24,8 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    # "https://bits-pilani.store",
+    # "https://www.bits-pilani.store",
     "https://www.amazoff.shop",
     "https://amazoff.shop",
     "https://plan-developments-clarke-russia.trycloudflare.com",
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',  # Whitenoise for static files
+    'django.contrib.sitemaps'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'commerce.urls'

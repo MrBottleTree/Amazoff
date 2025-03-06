@@ -31,7 +31,7 @@
             <h3 class="section-title">My Inventory</h3>
             <div class="inventory-container">
                 {% for inv in user_inventory %}
-                    <a href="#" class="inventory-item">  <!-- Wrapped in a link -->
+                    <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">
                         <div class="inventory-img">
                             <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
                         </div>
