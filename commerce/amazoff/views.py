@@ -38,6 +38,11 @@ def common_navs_data(request):
 
 def home(request):
     if request.user.is_authenticated:
+        person = people.objects.get(user_name=request.user.username)
+        if person.user_type == "customer":
+            return HttpResponseRedirect(reverse("allproducts"))
+        if person.user_type == "seller":
+            return HttpResponseRedirect(reverse("dashboard"))
         if not people.objects.filter(user_name=request.user.username).first():
             logout(request)
             return HttpResponseRedirect(reverse("home"))
