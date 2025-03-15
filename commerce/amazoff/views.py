@@ -157,7 +157,7 @@ def addaddress(request):
             return render(request, "amazoff/add_address.html", common_navs_data(request))
     else:
         return HttpResponseRedirect(reverse("home"))
-    
+
 def addinventory(request):
     if(request.method == "POST"):
         productid = request.POST["product"]
@@ -408,3 +408,8 @@ def allreviews(request, id):
     navs = common_navs_data(request)
     navs.update({"reviews":revs, "product":inv})
     return render(request, "amazoff/allreviews.html", navs)
+
+def deleteinventory(request, id):
+    inv = inventory.objects.get(inventory_id = id)
+    inv.delete()
+    return HttpResponseRedirect(reverse("dashboard"))

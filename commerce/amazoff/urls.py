@@ -25,6 +25,7 @@ urlpatterns = [
     path("orderhistory", views.vieworderhistory, name="orderhistory"),
     path("review/<int:id>", views._review, name="review"),
     path("allreviews/<int:id>", views.allreviews, name="allreviews"),
+    path("deleteinventory/<int:id>", views.deleteinventory, name="deleteinventory")
 ]
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import StaticViewSitemap

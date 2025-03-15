@@ -27,7 +27,7 @@ class people(models.Model):
 
     def __str__(self):
         return f"{self.user_type} {self.user_name}"
-    
+
 class address(models.Model):
     associated_with = models.ForeignKey(people, on_delete=models.CASCADE, related_name="addresses")
     address_id = models.AutoField(primary_key=True)

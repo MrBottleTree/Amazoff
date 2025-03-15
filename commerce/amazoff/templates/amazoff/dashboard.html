@@ -31,16 +31,22 @@
             <h3 class="section-title">My Inventory</h3>
             <div class="inventory-container">
                 {% for inv in user_inventory %}
-                    <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">
-                        <div class="inventory-img">
-                            <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
-                        </div>
-                        <div class="inventory-details">
-                            <h4>{{ inv.product.title }}</h4>
-                            <p><strong>Price:</strong> ₹{{ inv.product.price }}</p>
-                            <p><strong>Quantity:</strong> {{ inv.quantity }}</p>
-                        </div>
-                    </a>
+                    <div class="inventory-item-wrapper">
+                        <a href="{% url 'product' inv.inventory_id %}" class="inventory-item">
+                            <div class="inventory-img">
+                                <img alt="{{ inv.product.title }}" src="{{ inv.product.image.url }}">
+                            </div>
+                            <div class="inventory-details">
+                                <h4>{{ inv.product.title }}</h4>
+                                <p><strong>Price:</strong> ₹{{ inv.product.price }}</p>
+                                <p><strong>Quantity:</strong> {{ inv.quantity }}</p>
+                                <p><strong>Address:</strong> {{ inv.address }}</p>
+                            </div>
+                        </a>
+                        <a href="{% url 'deleteinventory' inv.inventory_id %}" class="btn-delete" onclick="return confirm('ARE YOU FUCKING SURE THAT YOU WANT TO DELETE THIS ITEM!?');">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
                 {% empty %}
                     <p class="empty-text">No inventory items found.</p>
                 {% endfor %}
